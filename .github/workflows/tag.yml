@@ -69,8 +69,10 @@ jobs:
         NEW_TAG=$(git describe --tags --abbrev=0)
         echo "::set-env name=NEW_TAG::$NEW_TAG"
         git tag -n99 -l $NEW_TAG
-        RELEASE_SUMMARY="Changes:
-        $(git log --pretty=format:'%s' $OLD_TAG..HEAD -i -E --grep='^([a-z]*?):' | sed 's/^/  - /')"
+        RELEASE_SUMMARY=<<EOF
+        Changes:
+        $(git log --pretty=format:'%s' $OLD_TAG..HEAD -i -E --grep='^([a-z]*?):' | sed 's/^/  - /')
+        EOF
         echo "::set-env name=RELEASE_SUMMARY::$RELEASE_SUMMARY"
         git tag $NEW_TAG $NEW_TAG^{} -f -m "This is a $BV_PART release.
 
