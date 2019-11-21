@@ -6,12 +6,12 @@ jobs:
   tag_master:
     if: >-
       startsWith( github.event.issue.title, 'bumpversion:' ) &&
-      && (
+      (
         contains( github.event.issue.title, 'major' ) ||
         contains( github.event.issue.title, 'minor' ) ||
         contains( github.event.issue.title, 'patch' )
-      )
-      && (
+      ) &&
+      (
         github.event.issue.user.login == 'lukasheinrich' ||
         github.event.issue.user.login == 'matthewfeickert' ||
         github.event.issue.user.login == 'kratsg'
