@@ -97,7 +97,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         args: |
-          comment "Something went wrong. I wasn't able to push. Check the [Actions pipeline](https://github.com/${{ env['GITHUB_REPOSITORY'] }}/actions?query=workflow%3A%22Tag+Creator%22) to see what happened."
+          comment "Something went wrong. I wasn't able to push. Check the [Actions pipeline](https://github.com/${{ github.repository }}/actions?query=workflow%3A%22Tag+Creator%22) to see what happened."
 
   always_job:
     name: Always run job
