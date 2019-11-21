@@ -7,8 +7,8 @@ jobs:
     if: >-
       (
         startsWith( github.event.issue.title, '[bumpversion:major]') ||
-        startsWith( github.event.issue.title, '[bumpversion:major]') ||
-        startsWith( github.event.issue.title, '[bumpversion:major]')
+        startsWith( github.event.issue.title, '[bumpversion:minor]') ||
+        startsWith( github.event.issue.title, '[bumpversion:patch]')
       ) && (
         github.event.issue.user.login == 'lukasheinrich' ||
         github.event.issue.user.login == 'matthewfeickert' ||
