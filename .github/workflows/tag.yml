@@ -40,8 +40,8 @@ jobs:
       with:
         args: label bumpversion/${{ env['BV_PART'] }}
     - uses: actions/checkout@master
-      with:
-        ref: master
+    - name: Prepare repository
+      run: git checkout "${GITHUB_REF:11}"
     - name: Set up Python 3.7
       uses: actions/setup-python@v1
       with:
