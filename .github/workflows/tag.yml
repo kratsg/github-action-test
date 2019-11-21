@@ -61,16 +61,15 @@ jobs:
         ISSUE_DESCRIPTION: ${{ github.event.issue.description }}
       run: |
         echo "bumpversion $BV_PART"
-        OLD_TAG=$(git describe --tags --abbrev=0)
+        echo "::set-env name=OLD_TAG::$(git describe --tags --abbrev=0)"
         bumpversion $BV_PART --message "Bump version: {current_version} → {new_version}
 
-        Closes #${ISSUE_NUMBER} via GitHub Actions."
-        NEW_TAG=$(git describe --abbrev=0 --tags)
+        Resolves #${ISSUE_NUMBER} via GitHub Actions."
+        echo "::set-env name=NEW_TAG::$(git describe --tags --abbrev=0)"
         git tag -n99 -l $NEW_TAG
-        echo "::set-env name=RELEASE_SUMMARY::$(git log --pretty=format:'%s' $OLD_TAG..HEAD -i -E --grep='^([a-z]*?):' | sed 's/^/  - /')"
+        echo "::set-env name=RELEASE_SUMMARY::Changes:\n$(git log --pretty=format:'%s' $OLD_TAG..HEAD -i -E --grep='^([a-z]*?):' | sed 's/^/  - /')"
         git tag $NEW_TAG $NEW_TAG^{} -f -m "This is a $BV_PART release.
 
-        Changes:
         ${RELEASE_SUMMARY}"
         git tag -n99 -l $NEW_TAG
     - name: comment on issue
@@ -79,18 +78,16 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         args: |
-          comment "Changes:
+          comment "Creating a ${BV_PART} release from ${OLD_TAG} → ${NEW_TAG}.
+
           ${{ env['RELEASE_SUMMARY'] }}"
-    - name: push changes
+    - name: always fail
       run: |
-        git rev-parse HEAD
-        git describe master
-        git describe --tags
-        git rev-list -n 1 $(git describe --tags)
-        git log -n 1
-        git show $(git describe --abbrev=0 --tags)
-        git status
         exit 1
+    - name: push changes
+      uses: ad-m/github-push-action@v0.5.0
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
 
   always_job:
     name: Always run job
