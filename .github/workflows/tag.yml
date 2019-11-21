@@ -6,9 +6,9 @@ jobs:
   bumpversion:
     if: >-
       (
-        startsWith( github.event.issue.title, '[bumpversion:major]') ||
-        startsWith( github.event.issue.title, '[bumpversion:minor]') ||
-        startsWith( github.event.issue.title, '[bumpversion:patch]')
+        startsWith( github.event.issue.title, '[bumpversion:major]' ) ||
+        startsWith( github.event.issue.title, '[bumpversion:minor]' ) ||
+        startsWith( github.event.issue.title, '[bumpversion:patch]' )
       ) && (
         github.event.issue.user.login == 'lukasheinrich' ||
         github.event.issue.user.login == 'matthewfeickert' ||
@@ -16,11 +16,11 @@ jobs:
       )
     env:
       IS_MAJOR: >-
-          ${{ startsWith( github.event.issue.title, '[bumpversion:major]') }}
+          ${{ startsWith( github.event.issue.title, '[bumpversion:major]' ) }}
       IS_MINOR: >-
-          ${{ startsWith( github.event.issue.title, '[bumpversion:minor]') }}
+          ${{ startsWith( github.event.issue.title, '[bumpversion:minor]' ) }}
       IS_PATCH: >-
-          ${{ startsWith( github.event.issue.title, '[bumpversion:patch]') }}
+          ${{ startsWith( github.event.issue.title, '[bumpversion:patch]' ) }}
     runs-on: ubuntu-latest
     steps:
     - name: determine part
