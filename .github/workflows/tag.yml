@@ -34,7 +34,8 @@ jobs:
         else
           echo "::set-env name=BV_PART::patch"
         fi
-    - uses: actions/github@v1.0.0
+    - name: add bumpversion/${{ env['BV_PART'] }} label
+      uses: actions/github@v1.0.0
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -66,11 +67,18 @@ jobs:
         Closes #${ISSUE_NUMBER} via GitHub Actions."
         NEW_TAG=$(git describe --abbrev=0 --tags)
         git tag -n99 -l $NEW_TAG
+        echo "::set-env name=RELEASE_SUMMARY::$(git log --pretty=format:'%s' $OLD_TAG..HEAD -i -E --grep='^([a-z]*?):' | sed 's/^/  - /')"
         git tag $NEW_TAG $NEW_TAG^{} -f -m "This is a $BV_PART release.
 
         Changes:
-        $(git log --pretty=format:'%s' $OLD_TAG..HEAD -i -E --grep='^([a-z]*?):' | sed 's/^/  - /')"
+        ${RELEASE_SUMMARY}"
         git tag -n99 -l $NEW_TAG
+    - name: comment on issue
+      uses: actions/github@v1.0.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        args: comment "${{ env['RELEASE_SUMMARY'] }}"
     - name: push changes
       run: |
         git rev-parse HEAD
