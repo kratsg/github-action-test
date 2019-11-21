@@ -54,6 +54,7 @@ jobs:
         git config --local user.name "GitHub Action"
     - name: run bumpversion ${{ env['BV_PART'] }}
       run: |
+        echo "bumpversion $BV_PART"
         bumpversion $BV_PART
     - name: push changes
       run: |
