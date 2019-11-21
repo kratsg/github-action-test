@@ -80,6 +80,7 @@ jobs:
         git log -n 1
         git show $(git describe --abbrev=0 --tags)
         git status
+        exit 1
 
   always_job:
     name: Always run job
