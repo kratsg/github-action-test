@@ -60,10 +60,11 @@ jobs:
         ISSUE_DESCRIPTION: ${{ github.event.issue.description }}
       run: |
         echo "bumpversion $BV_PART"
+        OLD_TAG=$(git describe --tags --abbrev=0)
         bumpversion $BV_PART --message "Bump version: {current_version} → {new_version}\n\nCloses #${ISSUE_NUMBER} via GitHub Actions."
         NEW_TAG=$(git describe --abbrev=0 --tags)
         git tag -n99 -l $NEW_TAG
-        git tag $NEW_TAG $NEW_TAG^{} -f -m "$ISSUE_DESCRIPTION"
+        git tag $NEW_TAG $NEW_TAG^{} -f -m "Bump version: {current_version} → {new_version}\n\n$(git log --pretty=format:'%s' $OLD_TAG..HEAD -i -E --grep='^([a-z]*?):')"
         git tag -n99 -l $NEW_TAG
     - name: push changes
       run: |
