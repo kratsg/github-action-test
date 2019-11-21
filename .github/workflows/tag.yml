@@ -5,22 +5,22 @@ on:
 jobs:
   tag_master:
     if: >-
-      startsWith( github.event.issue.title, 'bumpversion:' ) &&
       (
-        contains( github.event.issue.title, 'major' ) ||
-        contains( github.event.issue.title, 'minor' ) ||
-        contains( github.event.issue.title, 'patch' )
-      ) &&
-      (
+        startsWith( github.event.issue.title, '[bumpversion:major]') ||
+        startsWith( github.event.issue.title, '[bumpversion:major]') ||
+        startsWith( github.event.issue.title, '[bumpversion:major]')
+      ) && (
         github.event.issue.user.login == 'lukasheinrich' ||
         github.event.issue.user.login == 'matthewfeickert' ||
         github.event.issue.user.login == 'kratsg'
       )
     env:
       IS_MAJOR: >-
-          ${{ contains( github.event.issue.title, 'major' ) }}
+          ${{ startsWith( github.event.issue.title, '[bumpversion:major]') }}
       IS_MINOR: >-
-          ${{ contains( github.event.issue.title, 'minor' ) }}
+          ${{ startsWith( github.event.issue.title, '[bumpversion:minor]') }}
+      IS_PATCH: >-
+          ${{ startsWith( github.event.issue.title, '[bumpversion:patch]') }}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
@@ -50,3 +50,10 @@ jobs:
         git describe --tags
         git rev-list -n 1 $(git describe --tags)
         git status
+
+    always_job:
+      name: Always run job
+      runs-on: ubuntu-latest
+      steps:
+        - name: Always run
+          run: echo "This job is used to prevent the workflow status from showing as failed when all other jobs are skipped. See https://github.community/t5/GitHub-Actions/Workflow-is-failing-if-no-job-can-be-ran-due-to-condition/m-p/38085 for more information."
