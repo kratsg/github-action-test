@@ -23,6 +23,22 @@ jobs:
           ${{ startsWith( github.event.issue.title, '[bumpversion:patch]') }}
     runs-on: ubuntu-latest
     steps:
+    - name: determine part
+      run: |
+        if [ $IS_MAJOR == 'true' ]
+        then
+          echo "::set-env name=BV_PART::major"
+        elif [ $IS_MINOR == 'true' ]
+        then
+          echo "::set-env name=BV_PART::minor"
+        else
+          echo "::set-env name=BV_PART::patch"
+        fi
+    - uses: actions/github@v1.0.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        args: label bumpversion/${{ env['BV_PART'] }}
     - uses: actions/checkout@master
     - name: install bumpversion
       run: |
@@ -32,17 +48,9 @@ jobs:
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-    - name: run bumpversion
+    - name: run bumpversion ${{ env['BV_PART'] }}
       run: |
-        if [ $IS_MAJOR == 'true' ]
-        then
-          bumpversion major
-        elif [ $IS_MINOR == 'true' ]
-        then
-          bumpversion minor
-        else
-          bumpversion patch
-        fi
+        bumpversion $BV_PART
     - name: push changes
       run: |
         git rev-parse HEAD
