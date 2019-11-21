@@ -66,7 +66,6 @@ jobs:
     - name: push changes
       run: |
         git rev-parse HEAD
-        git rev-parse master
         git describe --tags
         git rev-list -n 1 $(git describe --tags)
         git status
