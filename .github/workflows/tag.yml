@@ -78,7 +78,9 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        args: comment "${{ env['RELEASE_SUMMARY'] }}"
+        args: |
+          comment "Changes:
+          ${{ env['RELEASE_SUMMARY'] }}"
     - name: push changes
       run: |
         git rev-parse HEAD
