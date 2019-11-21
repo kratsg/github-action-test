@@ -60,9 +60,11 @@ jobs:
         ISSUE_DESCRIPTION: ${{ github.event.issue.description }}
       run: |
         echo "bumpversion $BV_PART"
-        bumpversion $BV_PART --message "Bump version: {current_version} → {new_version} \
-                                        \
-                                        Closes ${ISSUE_NUMBER}"
+        bumpversion $BV_PART --message <<EOF \
+        Bump version: {current_version} → {new_version} \
+        \
+        Closes #${ISSUE_NUMBER} \
+        EOF
         NEW_TAG=$(git describe --abbrev=0 --tags)
         git tag -n99 -l $NEW_TAG
         git tag $NEW_TAG $NEW_TAG^{} -f -m "$ISSUE_DESCRIPTION"
