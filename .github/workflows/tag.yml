@@ -64,13 +64,17 @@ jobs:
                                         \
                                         Closes ${ISSUE_NUMBER}"
         NEW_TAG=$(git describe --abbrev=0 --tags)
+        git tag -n99 -l $NEW_TAG
         git tag $NEW_TAG $NEW_TAG^{} -f -m "$ISSUE_DESCRIPTION"
+        git tag -n99 -l $NEW_TAG
     - name: push changes
       run: |
         git rev-parse HEAD
         git describe master
         git describe --tags
         git rev-list -n 1 $(git describe --tags)
+        git log -n 1
+        git show $(git describe --abbrev=0 --tags)
         git status
 
   always_job:
