@@ -53,9 +53,16 @@ jobs:
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
     - name: run bumpversion ${{ env['BV_PART'] }}
+      env:
+        ISSUE_NUMBER: ${{ github.event.issue.number }}
+        ISSUE_DESCRIPTION: ${{ github.event.issue.description }}
       run: |
         echo "bumpversion $BV_PART"
-        bumpversion $BV_PART
+        bumpversion $BV_PART --message "Bump version: {current_version} → {new_version} \
+                                        \
+                                        Closes ${ISSUE_NUMBER}"
+        NEW_TAG=$(git describe --abbrev=0 --tags)
+        git tag $NEW_TAG $NEW_TAG^{} -f -m "$ISSUE_DESCRIPTION"
     - name: push changes
       run: |
         git rev-parse HEAD
