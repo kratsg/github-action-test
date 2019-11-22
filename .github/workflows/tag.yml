@@ -83,9 +83,6 @@ jobs:
       with:
         args: |
           comment "This is a ${{ env['BV_PART'] }} release from ${{ env['OLD_TAG'] }} → [${{ env['NUM_CHANGES'] }} change(s)] → ${{ env['NEW_TAG'] }}. I'm going to attempt to push now."
-    - name: always fail
-      run: |
-        exit 1
     - name: push changes
       uses: ad-m/github-push-action@v0.5.0
       with:
