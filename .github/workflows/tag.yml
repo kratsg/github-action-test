@@ -72,7 +72,7 @@ jobs:
 
         CHANGES=$(git log --pretty=format:'%s' $OLD_TAG..HEAD -i -E --grep='^([a-z]*?):')
         CHANGES_NEWLINE="$(echo "${CHANGES}" | sed -e 's/^/  - /')"
-        SANITIZED_CHANGES=$(echo "${CHANGES}" | sed -e 's|^|<li>|' -e 's|$|</li>|' -e 's|\(#\d+\)||' )
+        SANITIZED_CHANGES=$(echo "${CHANGES}" | sed -e 's/^/<li>/' -e 's|$|</li>|' -e 's/\(#\d+\)//' )
         echo "::set-env name=CHANGES::${SANITIZED_CHANGES//$'\n'/}"
         NUM_CHANGES=$(echo -n "$CHANGES" | grep -c '^')
         echo "::set-env name=NUM_CHANGES::${NUM_CHANGES}"
