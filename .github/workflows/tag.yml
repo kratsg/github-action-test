@@ -34,12 +34,12 @@ jobs:
         else
           echo "::set-env name=BV_PART::patch"
         fi
+    - name: Checkout master
+      uses: actions/checkout@master
     - name: Set up git user
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-    - name: Checkout master
-      uses: actions/checkout@master
     - name: Squash and merge to master
       if: github.event.pull_request.action == 'labeled'
       run: |
