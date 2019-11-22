@@ -44,15 +44,13 @@ jobs:
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-    - name: Squash and merge to master
+    - name: Checkout master
+      run: git checkout master
+    - name: Squash and merge PR#${{ github.event.pull_request.number }} to master
       if: github.event.action == 'labeled'
       run: |
-        git checkout master
         git merge --squash "origin/${GITHUB_HEAD_REF}"
         git commit -m "${PR_TITLE} (#${PR_NUMBER})"
-    - name: Prepare repository for tagging
-      if: github.event.action == 'closed' && github.event.pull_request.merged
-      run: git checkout "${GITHUB_REF:11}"
     - name: Set up Python 3.7
       uses: actions/setup-python@v1
       with:
