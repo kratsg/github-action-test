@@ -47,6 +47,7 @@ jobs:
     - name: Squash and merge to master
       if: github.event.action == 'labeled'
       run: |
+        git branch -a
         git checkout master
         git merge --squash "${GITHUB_HEAD_REF}"
         git commit -m "${PR_TITLE} (#${PR_NUMBER})"
