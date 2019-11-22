@@ -45,13 +45,13 @@ jobs:
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
     - name: Squash and merge to master
-      if: github.event.pull_request.action == 'labeled'
+      if: github.event.action == 'labeled'
       run: |
         git checkout master
         git merge --squash "${GITHUB_HEAD_REF}"
         git commit -m "${PR_TITLE} (#${PR_NUMBER})"
     - name: Prepare repository for tagging
-      if: github.event.pull_request.action == 'closed' && github.event.pull_request.merged
+      if: github.event.action == 'closed' && github.event.pull_request.merged
       run: git checkout "${GITHUB_REF:11}"
     - name: Set up Python 3.7
       uses: actions/setup-python@v1
@@ -80,7 +80,7 @@ jobs:
         git tag -n99 -l $NEW_TAG
     - name: comment on issue
       if: >-
-        github.event.pull_request.action == 'labeled'
+        github.event.action == 'labeled'
       uses: actions/github@v1.0.0
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -89,7 +89,7 @@ jobs:
           comment "I've queued this up. When it gets merged, I'll create a ${{ env['BV_PART'] }} release from ${{ env['OLD_TAG'] }} → ${{ env['NEW_TAG'] }} which has ${{ env['NUM_CHANGES'] }} other change(s) [not including this PR]."
     - name: push changes
       if: >-
-        github.event.pull_request.action == 'closed' && github.event.pull_request.merged
+        github.event.action == 'closed' && github.event.pull_request.merged
       uses: ad-m/github-push-action@v0.5.0
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
