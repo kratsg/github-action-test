@@ -78,7 +78,7 @@ jobs:
         echo "::set-env name=NUM_CHANGES::${NUM_CHANGES}"
         git tag $NEW_TAG $NEW_TAG^{} -f -m "$(printf "This is a $BV_PART release from $OLD_TAG → $NEW_TAG.\n\nChanges:\n$CHANGES_NEWLINE")"
         git tag -n99 -l $NEW_TAG
-    - name: comment on issue
+    - name: Comment on issue
       if: >-
         github.event.action == 'labeled'
       uses: actions/github@v1.0.0
@@ -87,13 +87,13 @@ jobs:
       with:
         args: |
           comment "I've queued this up. When it gets merged, I'll create a ${{ env['BV_PART'] }} release from ${{ env['OLD_TAG'] }} → ${{ env['NEW_TAG'] }} which includes the following ${{ env['NUM_CHANGES'] }} change(s) [including this PR]:<br />${{ env['CHANGES'] }}<br />If you make any more changes, you probably want to re-trigger me again by removing the `bumpversion/${{ env['BV_PART'] }}` label and then adding it back again."
-    - name: push changes
+    - name: Push changes
       if: >-
         github.event.action == 'closed' && github.event.pull_request.merged
       uses: ad-m/github-push-action@v0.5.0
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-    - name: comment that it failed
+    - name: Comment that it failed
       if: failure()
       uses: actions/github@v1.0.0
       env:
