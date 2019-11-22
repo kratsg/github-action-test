@@ -86,7 +86,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         args: |
-          comment "I've queued this up. When it gets merged, I'll create a ${{ env['BV_PART'] }} release from ${{ env['OLD_TAG'] }} → ${{ env['NEW_TAG'] }} which has ${{ env['NUM_CHANGES'] }} other change(s) [not including this PR]."
+          comment "I've queued this up. When it gets merged, I'll create a ${{ env['BV_PART'] }} release from ${{ env['OLD_TAG'] }} → ${{ env['NEW_TAG'] }} which has ${{ env['NUM_CHANGES'] }} change(s) [including this PR]."
     - name: push changes
       if: >-
         github.event.action == 'closed' && github.event.pull_request.merged
