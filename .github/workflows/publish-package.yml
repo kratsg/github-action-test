@@ -8,12 +8,19 @@ on:
   pull_request:
     branches:
     - master
+  create:
+    tags:
+    - v*
 
 jobs:
   build-and-publish:
     name: Build and publish Python distro to (Test)PyPI
     runs-on: ubuntu-latest
     steps:
+    - name: Dump GitHub context
+      env:
+        GITHUB_CONTEXT: ${{ toJson(github) }}
+      run: echo "$GITHUB_CONTEXT"
     - uses: actions/checkout@master
     - name: Set up Python 3.7
       uses: actions/setup-python@v1
