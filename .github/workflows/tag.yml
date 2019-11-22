@@ -102,7 +102,7 @@ jobs:
         args: |
           comment ":cry: Something went wrong. I am not able to push. Check the [Actions pipeline](https://github.com/${{ github.repository }}/actions?query=workflow%3A%22Tag+Creator%22) to see what happened."
     - name: remove labels
-      uses: andymckay/labeler@1.0.0
+      uses: andymckay/labeler@1.0.2
       with:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
         remove-labels: "bumpversion/major, bumpversion/minor, bumpversion/patch"
