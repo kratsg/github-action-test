@@ -71,9 +71,9 @@ jobs:
         git tag -n99 -l $NEW_TAG
 
         CHANGES=$(git log --pretty=format:'%s' $OLD_TAG..HEAD -i -E --grep='^([a-z]*?):')
-        CHANGES_NEWLINE="$(echo "${CHANGES}" | sed 's/^/  - /')"
-        SANITIZED_CHANGES=$(echo "${CHANGES}" | sed 's|^|<li>|' 's|$|</li>|' 's|\(#\d+\)||')
-        echo "::set-env name=CHANGES::${SANITIZED_CHANGES//$'\n'/<br />}"
+        CHANGES_NEWLINE="$(echo "${CHANGES}" | sed -e 's/^/  - /')"
+        SANITIZED_CHANGES=$(echo "${CHANGES}" | sed -e 's|^|<li>|' -e 's|$|</li>|' -e 's|\(#\d+\)||' )
+        echo "::set-env name=CHANGES::${SANITIZED_CHANGES//$'\n'/}"
         NUM_CHANGES=$(echo -n "$CHANGES" | grep -c '^')
         echo "::set-env name=NUM_CHANGES::${NUM_CHANGES}"
         git tag $NEW_TAG $NEW_TAG^{} -f -m "$(printf "This is a $BV_PART release from $OLD_TAG → $NEW_TAG.\n\nChanges:\n$CHANGES_NEWLINE")"
