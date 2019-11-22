@@ -10,7 +10,9 @@ env:
       ${{ contains( github.event.pull_request.labels.*.name, 'bumpversion/minor' ) }}
   IS_PATCH: >-
       ${{ contains( github.event.pull_request.labels.*.name, 'bumpversion/patch' ) }}
-
+  PR_NUMBER: ${{ github.event.pull_request.number }}
+  PR_TITLE: ${{ github.event.pull_request.title }}
+  GITHUB_HEAD_REF: ${{ github.head_ref }}
 jobs:
   bumpversion:
     if: >-
@@ -21,6 +23,10 @@ jobs:
       )
     runs-on: ubuntu-latest
     steps:
+    - name: Dump GitHub context
+      env:
+        GITHUB_CONTEXT: ${{ toJson(github) }}
+      run: echo "$GITHUB_CONTEXT"
     - name: Determine version part
       run: |
         if [ $IS_MAJOR == 'true' ]
@@ -32,11 +38,20 @@ jobs:
         else
           echo "::set-env name=BV_PART::patch"
         fi
-    - name: Checkout master
+    - name: Checkout repository
       uses: actions/checkout@master
-      with:
-        ref: master
-    - name: Prepare repository
+    - name: Set up git user
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+    - name: Squash and merge to master
+      if: github.event.action == 'labeled'
+      run: |
+        git checkout master
+        git merge --squash "origin/${GITHUB_HEAD_REF}"
+        git commit -m "${PR_TITLE} (#${PR_NUMBER})"
+    - name: Prepare repository for tagging
+      if: github.event.action == 'closed' && github.event.pull_request.merged
       run: git checkout "${GITHUB_REF:11}"
     - name: Set up Python 3.7
       uses: actions/setup-python@v1
@@ -46,41 +61,35 @@ jobs:
       run: |
         python -m pip install --upgrade pip setuptools wheel
         pip install bumpversion
-    - name: Set up git user
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
     - name: Run bumpversion ${{ env['BV_PART'] }}
-      env:
-        PR_NUMBER: ${{ github.event.pull_request.number }}
       run: |
-        echo "bumpversion $BV_PART"
         OLD_TAG=$(git describe --tags --abbrev=0)
-        echo "::set-env name=OLD_TAG::$OLD_TAG"
+        echo "::set-env name=OLD_TAG::${OLD_TAG}"
         bumpversion $BV_PART --message "Bump version: {current_version} → {new_version}
 
         Triggered by #${PR_NUMBER} via GitHub Actions."
         NEW_TAG=$(git describe --tags --abbrev=0)
-        echo "::set-env name=NEW_TAG::$NEW_TAG"
+        echo "::set-env name=NEW_TAG::${NEW_TAG}"
         git tag -n99 -l $NEW_TAG
 
         CHANGES="$(git log --pretty=format:'%s' $OLD_TAG..HEAD -i -E --grep='^([a-z]*?):' | sed 's/^/  - /')"
+        echo "::set-env name=CHANGES::${CHANGES}"
         NUM_CHANGES=$(echo -n "$CHANGES" | grep -c '^')
-        echo "::set-env name=NUM_CHANGES::$NUM_CHANGES"
+        echo "::set-env name=NUM_CHANGES::${NUM_CHANGES}"
         git tag $NEW_TAG $NEW_TAG^{} -f -m "$(printf "This is a $BV_PART release from $OLD_TAG → $NEW_TAG.\n\nChanges:\n$CHANGES")"
         git tag -n99 -l $NEW_TAG
     - name: comment on issue
       if: >-
-        github.event.pull_request.action == 'labeled'
+        github.event.action == 'labeled'
       uses: actions/github@v1.0.0
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         args: |
-          comment "I've queued this up. When it gets merged, I'll create a ${{ env['BV_PART'] }} release from ${{ env['OLD_TAG'] }} → ${{ env['NEW_TAG'] }} which has ${{ env['NUM_CHANGES'] }} other change(s) [not including this PR]."
+          comment "I've queued this up. When it gets merged, I'll create a ${{ env['BV_PART'] }} release from ${{ env['OLD_TAG'] }} → ${{ env['NEW_TAG'] }} which has ${{ env['NUM_CHANGES'] }} change(s) [including this PR]."
     - name: push changes
       if: >-
-        github.event.pull_request.action == 'closed' && github.event.pull_request.merged
+        github.event.action == 'closed' && github.event.pull_request.merged
       uses: ad-m/github-push-action@v0.5.0
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
